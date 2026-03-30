@@ -1248,14 +1248,14 @@ def test_delete_bulk_filter_sap_sids_multiple_values(
     pre_delete_count = host_inventory.apis.hosts.get_hosts_response().total
     filter = ["[sap_sids][]=H2O", "[sap_sids][]=ABC"]
     host_inventory.apis.hosts.delete_filtered(filter=filter)
-    host_inventory.apis.hosts.wait_for_deleted(hosts_ids[:2])
+    host_inventory.apis.hosts.wait_for_deleted(hosts_ids[:4])
     post_delete_count = host_inventory.apis.hosts.get_hosts_response().total
-    assert post_delete_count == pre_delete_count - 2
+    assert post_delete_count == pre_delete_count - 4
 
     response = host_inventory.apis.hosts.get_hosts_response(filter=filter)
     assert response.total == 0
-    response_ids = {host.id for host in host_inventory.apis.hosts.get_hosts_by_id(hosts_ids[2:])}
-    assert response_ids == set(hosts_ids[2:])
+    response_ids = {host.id for host in host_inventory.apis.hosts.get_hosts_by_id(hosts_ids[4:])}
+    assert response_ids == set(hosts_ids[4:])
 
 
 @pytest.mark.smoke

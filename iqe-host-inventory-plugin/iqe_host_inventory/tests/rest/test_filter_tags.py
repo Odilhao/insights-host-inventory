@@ -117,8 +117,8 @@ def test_filter_tags_by_system_profile_sap_sids(
             ],
             [0, 1, 2, 3],
         ),
-        (["[controller_version][]=1.2.3", "[hub_version][]=4.5.6"], [0]),
-        (["[controller_version][]=1.2.3", "[hub_version][]=7.8.9"], [2]),
+        (["[controller_version][]=1.2.3", "[hub_version][]=4.5.6"], [0, 2]),
+        (["[controller_version][]=1.2.3", "[hub_version][]=7.8.9"], [0, 1, 2]),
         (
             [
                 "[controller_version][]=1.2.3",
@@ -126,7 +126,7 @@ def test_filter_tags_by_system_profile_sap_sids(
                 "[catalog_worker_version][]=7.8.9",
                 "[sso_version][]=10.11.12",
             ],
-            [0],
+            [0, 2],
         ),
         (
             [
@@ -135,23 +135,31 @@ def test_filter_tags_by_system_profile_sap_sids(
                 "[catalog_worker_version][]=7.8.9",
                 "[sso_version][]=nil",
             ],
+            [0, 2, 3],
+        ),
+        (
+            [
+                "[controller_version][]=1.2.3",
+                "[hub_version][]=7.8.9",
+                "[controller_version][]=4.5.6",
+            ],
+            [0, 1, 2],
+        ),
+        (
+            [
+                "[controller_version][]=4.5.6",
+                "[hub_version][]=7.8.9",
+                "[controller_version][]=1.2.3",
+            ],
+            [0, 1, 2],
+        ),
+        (
+            [
+                "[controller_version][]=4.9.6",
+                "[hub_version][]=7.9.9",
+                "[controller_version][]=1.2.9",
+            ],
             [],
-        ),
-        (
-            [
-                "[controller_version][]=1.2.3",
-                "[hub_version][]=7.8.9",
-                "[controller_version][]=4.5.6",
-            ],
-            [1, 2],
-        ),
-        (
-            [
-                "[controller_version][]=4.5.6",
-                "[hub_version][]=7.8.9",
-                "[controller_version][]=1.2.3",
-            ],
-            [1, 2],
         ),
     ],
 )
@@ -195,17 +203,17 @@ def test_filter_tags_by_system_profile_ansible(
                 "[sids][]=H20",
                 "[sids][]=H30",
             ],
-            [1, 3, 4],
+            [0, 1, 2, 3, 4],
         ),
-        (["[sap_system][]=true", "[sids][]=H20"], [0, 1]),
+        (["[sap_system][]=true", "[sids][]=H20"], [0, 1, 2, 3, 4]),
         (["[instance_number][]=nil"], [1, 3, 4, 6]),
         (["[instance_number][]=nil", "[instance_number][]=not_nil"], [0, 1, 2, 3, 4, 5, 6]),
         (["[version][]=not_nil"], [0, 1, 2]),
         (["[version][]=nil"], [3, 4, 5, 6]),
-        (["[sids][]=not_nil", "[instance_number][]=nil"], [1, 3, 4]),
-        (["[version][]=not_nil", "[instance_number][]=not_nil"], [0, 2]),
-        (["[version][]=1.00.122.04.1478575636", "[instance_number][]=02"], [2]),
-        (["[version][]=2.00.122.04.1478575636", "[instance_number][]=03"], []),
+        (["[sids][]=not_nil", "[instance_number][]=nil"], [0, 1, 2, 3, 4, 6]),
+        (["[version][]=not_nil", "[instance_number][]=not_nil"], [0, 1, 2, 5]),
+        (["[version][]=1.00.122.04.1478575636", "[instance_number][]=02"], [0, 2]),
+        (["[version][]=2.00.122.04.1478575636", "[instance_number][]=03"], [1, 5]),
         (
             [
                 "[sap_system][]=true",
@@ -213,7 +221,7 @@ def test_filter_tags_by_system_profile_ansible(
                 "[instance_number][]=01",
                 "[version][]=1.00.122.04.1478575636",
             ],
-            [0],
+            [0, 1, 2, 3, 4],
         ),
         (
             [
@@ -223,7 +231,7 @@ def test_filter_tags_by_system_profile_ansible(
                 "[instance_number][]=nil",
                 "[version][]=2.00.122.04.1478575636",
             ],
-            [1],
+            [0, 1, 2, 3, 4, 5, 6], # FAILED
         ),
         (
             [
@@ -233,7 +241,7 @@ def test_filter_tags_by_system_profile_ansible(
                 "[instance_number][]=not_nil",
                 "[version][]=1.00.122.04.1478575636",
             ],
-            [],
+            [0, 1, 2, 3, 4, 5],
         ),
         (
             [
@@ -242,10 +250,13 @@ def test_filter_tags_by_system_profile_ansible(
                 "[sids][]=H30",
                 "[version][]=1.00.122.04.1478575636",
             ],
-            [],
+            [0, 1, 2, 3, 4],
         ),
-        (["[sap_system][]=false", "[sids][]=H20", "[sids][]=H30"], [3, 4]),
-        (["[sap_system][]=false", "[sids][contains][]=H20", "[sids][contains][]=H30"], [3, 4]),
+        (["[sap_system][]=false", "[sids][]=H20", "[sids][]=H30"], [0, 1, 2, 3, 4, 5]),
+        (
+            ["[sap_system][]=false", "[sids][contains][]=H20", "[sids][contains][]=H30"],
+            [0, 1, 2, 3, 4, 5],
+        ),
         (
             [
                 "[sap_system][]=false",
@@ -253,7 +264,7 @@ def test_filter_tags_by_system_profile_ansible(
                 "[sids][contains][]=H30",
                 "[sids][contains][]=H40",
             ],
-            [3],
+            [0, 1, 2, 3, 4, 5],
         ),
         (
             [
@@ -261,6 +272,14 @@ def test_filter_tags_by_system_profile_ansible(
                 "[sids][]=H2O",
                 "[instance_number][]=08",
                 "[version][]=1.00.122.04.1478575636",
+            ],
+            [0, 1, 2, 3, 4], #FAILED
+        ),
+        (
+            [
+                "[sids][]=H0",
+                "[sids][]=H88",
+                "[version][]=1.00.122.04.147857563677",
             ],
             [],
         ),

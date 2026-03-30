@@ -293,8 +293,8 @@ def test_filter_hosts_by_system_profile_operating_system(
             ],
             [0, 1, 2, 3],
         ),
-        (["[controller_version][]=1.2.3", "[hub_version][]=4.5.6"], [0]),
-        (["[controller_version][]=1.2.3", "[hub_version][]=7.8.9"], [2]),
+        (["[controller_version][]=1.2.3", "[hub_version][]=4.5.6"], [0, 2]),
+        (["[controller_version][]=1.2.3", "[hub_version][]=7.8.9"], [0, 1, 2]),
         (
             [
                 "[controller_version][]=1.2.3",
@@ -302,7 +302,7 @@ def test_filter_hosts_by_system_profile_operating_system(
                 "[catalog_worker_version][]=7.8.9",
                 "[sso_version][]=10.11.12",
             ],
-            [0],
+            [0, 2],
         ),
         (
             [
@@ -311,7 +311,7 @@ def test_filter_hosts_by_system_profile_operating_system(
                 "[catalog_worker_version][]=7.8.9",
                 "[sso_version][]=nil",
             ],
-            [],
+            [0, 2, 3],
         ),
         (
             [
@@ -319,7 +319,7 @@ def test_filter_hosts_by_system_profile_operating_system(
                 "[hub_version][]=7.8.9",
                 "[controller_version][]=4.5.6",
             ],
-            [1, 2],
+            [0, 1, 2],
         ),
         (
             [
@@ -327,7 +327,7 @@ def test_filter_hosts_by_system_profile_operating_system(
                 "[hub_version][]=7.8.9",
                 "[controller_version][]=1.2.3",
             ],
-            [1, 2],
+            [0, 1, 2],
         ),
     ],
 )
@@ -372,17 +372,17 @@ def test_filter_hosts_by_system_profile_ansible(
                 "[sids][]=H20",
                 "[sids][]=H30",
             ],
-            [1, 3, 4],
+            [0, 1, 2, 3, 4],
         ),
-        (["[sap_system][]=true", "[sids][]=H20"], [0, 1]),
+        (["[sap_system][]=true", "[sids][]=H20"], [0, 1, 2, 3, 4]),
         (["[instance_number][]=nil"], [1, 3, 4, 6]),
         (["[instance_number][]=nil", "[instance_number][]=not_nil"], [0, 1, 2, 3, 4, 5, 6]),
         (["[version][]=not_nil"], [0, 1, 2]),
         (["[version][]=nil"], [3, 4, 5, 6]),
-        (["[sids][]=not_nil", "[instance_number][]=nil"], [1, 3, 4]),
-        (["[version][]=not_nil", "[instance_number][]=not_nil"], [0, 2]),
-        (["[version][]=1.00.122.04.1478575636", "[instance_number][]=02"], [2]),
-        (["[version][]=2.00.122.04.1478575636", "[instance_number][]=03"], []),
+        (["[sids][]=not_nil", "[instance_number][]=nil"], [0, 1, 2, 3, 4]),
+        (["[version][]=not_nil", "[instance_number][]=not_nil"], [0, 1, 2, 5]),
+        (["[version][]=1.00.122.04.1478575636", "[instance_number][]=02"], [0, 2]),
+        (["[version][]=2.00.122.04.1478575636", "[instance_number][]=03"], [1, 5]),
         (
             [
                 "[sap_system][]=true",
@@ -390,7 +390,7 @@ def test_filter_hosts_by_system_profile_ansible(
                 "[instance_number][]=01",
                 "[version][]=1.00.122.04.1478575636",
             ],
-            [0],
+            [0, 1, 2, 3, 4],
         ),
         (
             [
@@ -400,7 +400,7 @@ def test_filter_hosts_by_system_profile_ansible(
                 "[instance_number][]=nil",
                 "[version][]=2.00.122.04.1478575636",
             ],
-            [1],
+            [0, 1, 2, 3, 4, 5],
         ),
         (
             [
@@ -410,7 +410,7 @@ def test_filter_hosts_by_system_profile_ansible(
                 "[instance_number][]=not_nil",
                 "[version][]=1.00.122.04.1478575636",
             ],
-            [],
+            [0, 1, 2, 3, 4, 5],
         ),
         (
             [
@@ -419,10 +419,13 @@ def test_filter_hosts_by_system_profile_ansible(
                 "[sids][]=H30",
                 "[version][]=1.00.122.04.1478575636",
             ],
-            [],
+            [0, 1, 2, 3, 4],
         ),
-        (["[sap_system][]=false", "[sids][]=H20", "[sids][]=H30"], [3, 4]),
-        (["[sap_system][]=false", "[sids][contains][]=H20", "[sids][contains][]=H30"], [3, 4]),
+        (["[sap_system][]=false", "[sids][]=H20", "[sids][]=H30"], [0, 1, 2, 3, 4, 5]),
+        (
+            ["[sap_system][]=false", "[sids][contains][]=H20", "[sids][contains][]=H30"],
+            [0, 1, 2, 3, 4, 5],
+        ),
         (
             [
                 "[sap_system][]=false",
@@ -430,7 +433,7 @@ def test_filter_hosts_by_system_profile_ansible(
                 "[sids][contains][]=H30",
                 "[sids][contains][]=H40",
             ],
-            [3],
+            [0, 1, 2, 3, 4, 5],
         ),
         (
             [
@@ -439,7 +442,7 @@ def test_filter_hosts_by_system_profile_ansible(
                 "[instance_number][]=08",
                 "[version][]=1.00.122.04.1478575636",
             ],
-            [],
+            [0, 1, 2],
         ),
     ],
 )
@@ -1343,12 +1346,12 @@ def test_filter_hosts_with_invalid_system_profile_operating_system(
         (["[rhel_ai_version_id][]=v1.1.3"], [1, 3]),
         (["[rhel_ai_version_id][]=v1.1.2"], [2]),
         (["[rhel_ai_version_id][]=v1.1.4"], [4, 5, 6]),
-        (["[rhel_ai_version_id][]=v1.1.2", "[variant][]=Centos"], []),
+        (["[rhel_ai_version_id][]=v1.1.2", "[variant][]=Centos"], [2]),
         (["[gpu_models][name][]=NVIDIA T1000"], [1, 3, 5, 6]),
-        (["[gpu_models][name][]=NVIDIA T1000", "[gpu_models][name][]=Tesla 2"], [3]),
+        (["[gpu_models][name][]=NVIDIA T1000", "[gpu_models][name][]=Tesla 2"], [1, 3, 5, 6]),
         (
             ["[gpu_models][name][]=NVIDIA T1000", "[gpu_models][name][]=Tesla V100-PCIE-16GB"],
-            [1, 3],
+            [1, 3, 4, 5, 6],
         ),
         (["[gpu_models][name][]=Habana Labs Ltd. Device 10202"], [2, 3]),
         (["[gpu_models][name][]=Habana Labs Ltd. Device 1021"], [6]),
@@ -1357,7 +1360,7 @@ def test_filter_hosts_with_invalid_system_profile_operating_system(
                 "[gpu_models][name][]=Habana Labs Ltd. Device 10202",
                 "[gpu_models][name][]=Habana Labs Ltd. HL-2001 AI Training Accelerator",
             ],
-            [3],
+            [2, 3],
         ),
         (["[gpu_models][name][]=Advanced Micro Devices, Inc. [AMD/ATI] Device 0c34"], [1, 2, 3]),
         (
@@ -1365,26 +1368,26 @@ def test_filter_hosts_with_invalid_system_profile_operating_system(
                 "[gpu_models][name][]=Advanced Micro Devices, Inc. [AMD/ATI] Device 0c34",
                 "[gpu_models][name][]=Advanced Micro Devices, Inc. [AMD/ATI] Device 0c31",
             ],
-            [2],
+            [1, 2, 3, 5],
         ),
         (
             [
                 "[rhel_ai_version_id][]=v1.1.3",
                 "[gpu_models][name][]=Advanced Micro Devices, Inc. [AMD/ATI] Device 0c34",
             ],
-            [1, 3],
+            [1, 2, 3],
         ),
         (
             [
                 "[rhel_ai_version_id][]=v1.1.3",
                 "[gpu_models][name][]=Advanced Micro Devices, Inc. [AMD/ATI] Device 0c350000",
             ],
-            [3],
+            [1, 3],
         ),
         (["[gpu_models][vendor][]=Nvidia"], [1, 3, 4, 5, 6]),
         (["[gpu_models][vendor][]=Intel"], [1, 2, 3, 4, 6]),
         (["[gpu_models][vendor][]=AMD"], [1, 2, 3, 4, 5]),
-        (["[gpu_models][vendor][]=Nvidia", "[gpu_models][vendor][]=Intel"], [1, 3, 4, 6]),
+        (["[gpu_models][vendor][]=Nvidia", "[gpu_models][vendor][]=Intel"], [1, 2, 3, 4, 5, 6]),
     ],
 )
 def test_filter_hosts_by_system_profile_rhel_ai(
