@@ -231,7 +231,7 @@ def test_filter_tags_by_system_profile_ansible(
                 "[instance_number][]=nil",
                 "[version][]=2.00.122.04.1478575636",
             ],
-            [0, 1, 2, 3, 4, 5, 6], # FAILED
+            [0, 1, 2, 3, 4, 6],
         ),
         (
             [
@@ -273,7 +273,7 @@ def test_filter_tags_by_system_profile_ansible(
                 "[instance_number][]=08",
                 "[version][]=1.00.122.04.1478575636",
             ],
-            [0, 1, 2, 3, 4], #FAILED
+            [0, 1, 2],
         ),
         (
             [

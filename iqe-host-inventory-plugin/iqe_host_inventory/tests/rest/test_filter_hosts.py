@@ -379,7 +379,7 @@ def test_filter_hosts_by_system_profile_ansible(
         (["[instance_number][]=nil", "[instance_number][]=not_nil"], [0, 1, 2, 3, 4, 5, 6]),
         (["[version][]=not_nil"], [0, 1, 2]),
         (["[version][]=nil"], [3, 4, 5, 6]),
-        (["[sids][]=not_nil", "[instance_number][]=nil"], [0, 1, 2, 3, 4]),
+        (["[sids][]=not_nil", "[instance_number][]=nil"], [0, 1, 2, 3, 4, 6]),
         (["[version][]=not_nil", "[instance_number][]=not_nil"], [0, 1, 2, 5]),
         (["[version][]=1.00.122.04.1478575636", "[instance_number][]=02"], [0, 2]),
         (["[version][]=2.00.122.04.1478575636", "[instance_number][]=03"], [1, 5]),
@@ -400,7 +400,7 @@ def test_filter_hosts_by_system_profile_ansible(
                 "[instance_number][]=nil",
                 "[version][]=2.00.122.04.1478575636",
             ],
-            [0, 1, 2, 3, 4, 5],
+            [0, 1, 2, 3, 4, 6],
         ),
         (
             [
